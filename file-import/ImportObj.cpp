@@ -20,7 +20,7 @@
 //   }
 //   return errorCode;
 // }
-// #define glCheckError() glCheckError_(__FILE__, __LINE__) 
+// #define glCheckError() glCheckError_(__FILE__, __LINE__)
 
 // #ifdef DEBUG
 // #define GL_CHECK(x) do { \
@@ -35,9 +35,8 @@
 // #define GL_CHECK(x) x
 // #endif
 
-
 int main() {
-  if(!glfwInit()) {
+  if (!glfwInit()) {
     std::cerr << "glfwInit failed\n";
     return 1;
   }
@@ -47,7 +46,7 @@ int main() {
   glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
   GLFWwindow* window = glfwCreateWindow(800, 600, "test", nullptr, nullptr);
-  if(!window) {
+  if (!window) {
     std::cerr << "glfwCreateWindow failed\n";
     glfwTerminate();
     return 1;
@@ -57,16 +56,18 @@ int main() {
 
   GLenum err = glewInit();
 
-  std::cout<<"Version: " << glGetString(GL_VERSION) << "\n";
-  std::cout<<"Renderer: " << glGetString(GL_RENDERER) << "\n";
-  std::cout<<"Vendor: " << glGetString(GL_VENDOR) << "\n";
+  std::cout << "Version: " << glGetString(GL_VERSION) << "\n";
+  std::cout << "Renderer: " << glGetString(GL_RENDERER) << "\n";
+  std::cout << "Vendor: " << glGetString(GL_VENDOR) << "\n";
 
   try {
-    auto mesh = Renderer::load_mesh_from_file("/home/nasty/Workspace/VSCodeprojects/3d-renderer/file-import/penis.obj");
+    auto mesh = Renderer::load_mesh_from_file(
+        "/home/nasty/Workspace/VSCodeprojects/3d-renderer/file-import/"
+        "penis.obj");
     Renderer::Object object(std::move(mesh));
-    std::cout<<"Successful import!\n";
+    std::cout << "Successful import!\n";
   } catch (std::runtime_error& e) {
-      std::cout<<e.what();
+    std::cout << e.what();
   }
 
   glfwDestroyWindow(window);

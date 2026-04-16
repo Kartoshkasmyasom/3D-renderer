@@ -1,34 +1,34 @@
 #pragma once
 
-#include <vector>
 #include <Eigen/Dense>
+#include <vector>
 
-namespace Renderer{
-    using Vector3 = Eigen::Vector3d;
+namespace Renderer {
+using Vector3 = Eigen::Vector3d;
 
-    struct Mesh {
-        Mesh() {
-            num_indices = 0;
-            base_vertex = 0;
-            base_index = 0;
-        }
+struct Mesh {
+  Mesh() {
+    num_indices = 0;
+    base_vertex = 0;
+    base_index = 0;
+  }
 
-        unsigned int num_indices;
-        unsigned int base_vertex;
-        unsigned int base_index;
-    };
+  unsigned int num_indices;
+  unsigned int base_vertex;
+  unsigned int base_index;
+};
 
-    struct MeshData {
-        std::vector<Mesh> meshes;
-        std::vector<Vector3> positions;
-        std::vector<Vector3> normals;
-        std::vector<unsigned int> indices;
+struct MeshData {
+  std::vector<Mesh> meshes;
+  std::vector<Vector3> positions;
+  std::vector<Vector3> normals;
+  std::vector<unsigned int> indices;
 
-        void clear() {
-            meshes.clear();
-            positions.clear();
-            normals.clear();
-            indices.clear();
-        }
-    };
-} // namespace Renderer
+  void clear() {
+    meshes.clear();
+    positions.clear();
+    normals.clear();
+    indices.clear();
+  }
+};
+}  // namespace Renderer
