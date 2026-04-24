@@ -16,3 +16,4 @@ find_package(assimp REQUIRED)
 
 add_subdirectory(entities)
 add_subdirectory(file-import)
+add_subdirectory(project-exceptions)

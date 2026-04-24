@@ -1,4 +1,6 @@
 #include "TriangulatedObject.hpp"
+#include "GlCheck.hpp"
+
 #include <iostream>
 
 namespace Renderer {
@@ -48,35 +50,35 @@ void TriangulatedObject::upload_to_gpu(const MeshData& data) {
   }
 
   glGenVertexArrays(1, &VAO_);
-  glBindVertexArray(VAO_);
+  GlCheck(glBindVertexArray(VAO_));
 
   glGenBuffers(static_cast<GLsizei>(buffers_.size()), buffers_.data());
 
   glBindBuffer(GL_ARRAY_BUFFER, buffers_[POS_VB]);
-  glBufferData(GL_ARRAY_BUFFER,
+  GlCheck(glBufferData(GL_ARRAY_BUFFER,
                static_cast<GLsizeiptr>(sizeof(data.positions[0]) *
                                        data.positions.size()),
-               &data.positions[0], GL_STATIC_DRAW);
+               &data.positions[0], GL_STATIC_DRAW));
   glEnableVertexAttribArray(POSITION_LOCATION);
-  glVertexAttribPointer(POSITION_LOCATION, 3, GL_FLOAT, GL_FALSE,
-                        sizeof(Vector3), 0);
+  GlCheck(glVertexAttribPointer(POSITION_LOCATION, 3, GL_FLOAT, GL_FALSE,
+                        sizeof(Vector3), 0));
 
   if (!data.normals.empty()) {
     glBindBuffer(GL_ARRAY_BUFFER, buffers_[NORMAL_VB]);
-    glBufferData(
+    GlCheck(glBufferData(
         GL_ARRAY_BUFFER,
         static_cast<GLsizeiptr>(sizeof(data.normals[0]) * data.normals.size()),
-        &data.normals[0], GL_STATIC_DRAW);
+        &data.normals[0], GL_STATIC_DRAW));
     glEnableVertexAttribArray(NORMAL_LOCATION);
-    glVertexAttribPointer(NORMAL_LOCATION, 3, GL_FLOAT, GL_FALSE,
-                          sizeof(Vector3), 0);
+    GlCheck(glVertexAttribPointer(NORMAL_LOCATION, 3, GL_FLOAT, GL_FALSE,
+                          sizeof(Vector3), 0));
   }
 
   glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, buffers_[INDEX_BUFFER]);
-  glBufferData(
+  GlCheck(glBufferData(
       GL_ELEMENT_ARRAY_BUFFER,
       static_cast<GLsizeiptr>(sizeof(data.indices[0]) * data.indices.size()),
-      &data.indices[0], GL_STATIC_DRAW);
+      &data.indices[0], GL_STATIC_DRAW));
 
   glBindVertexArray(0);
 }

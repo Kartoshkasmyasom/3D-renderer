@@ -12,11 +12,15 @@ add_library(${PROJECT_NAME}
     src/TriangulatedObject.cpp
     src/Shader.cpp
 )
-target_include_directories(${PROJECT_NAME} PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include)
+target_include_directories(${PROJECT_NAME} PUBLIC 
+    ${CMAKE_CURRENT_SOURCE_DIR}/include
+    ${CMAKE_SOURCE_DIR}/project-exceptions/include
+)
 
 target_link_libraries(${PROJECT_NAME}
     PUBLIC
     OpenGL::GL
     GLEW::GLEW
     Eigen3::Eigen
+    project-exceptions
 )
