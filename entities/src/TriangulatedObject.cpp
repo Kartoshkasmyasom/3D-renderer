@@ -1,8 +1,8 @@
-#include "Object.hpp"
+#include "TriangulatedObject.hpp"
 #include <iostream>
 
 namespace Renderer {
-void Object::clear() noexcept {
+void TriangulatedObject::clear() noexcept {
   if (VAO_ != 0) {
     glDeleteVertexArrays(1, &VAO_);
     VAO_ = 0;
@@ -16,22 +16,22 @@ void Object::clear() noexcept {
   mesh_data_.clear();
 }
 
-Object::Object(MeshData&& data) : mesh_data_(std::move(data)) {
+TriangulatedObject::TriangulatedObject(MeshData&& data) : mesh_data_(std::move(data)) {
   upload_to_gpu(mesh_data_);
 }
 
-Object::~Object() {
+TriangulatedObject::~TriangulatedObject() {
   clear();
 }
 
-Object::Object(Object&& obj) noexcept {
+TriangulatedObject::TriangulatedObject(TriangulatedObject&& obj) noexcept {
   VAO_ = obj.VAO_;
   buffers_ = obj.buffers_;
   obj.VAO_ = 0;
   obj.buffers_.fill(0);
 }
 
-Object& Object::operator=(Object&& obj) noexcept {
+TriangulatedObject& TriangulatedObject::operator=(TriangulatedObject&& obj) noexcept {
   if (this != &obj) {
     clear();
     VAO_ = obj.VAO_;
@@ -42,7 +42,7 @@ Object& Object::operator=(Object&& obj) noexcept {
   return *this;
 }
 
-void Object::upload_to_gpu(const MeshData& data) {
+void TriangulatedObject::upload_to_gpu(const MeshData& data) {
   if (data.positions.empty() || data.indices.empty()) {
     throw std::runtime_error("Could not upload empty mesh on GPU!");
   }

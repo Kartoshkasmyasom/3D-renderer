@@ -4,7 +4,8 @@
 #include <vector>
 
 namespace Renderer {
-using Vector3 = Eigen::Vector3d;
+using Vector3 = Eigen::Vector3f;
+using Vector4 = Eigen::Vector4f;
 
 struct Mesh {
   Mesh() {

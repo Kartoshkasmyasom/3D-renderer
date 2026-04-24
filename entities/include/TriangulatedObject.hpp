@@ -11,17 +11,17 @@
 
 namespace Renderer {
 
-class Object {
+class TriangulatedObject {
  public:
-  Object() = default;
-  explicit Object(MeshData&& data);
+  TriangulatedObject() = default;
+  explicit TriangulatedObject(MeshData&& data);
 
-  ~Object() noexcept;
+  ~TriangulatedObject() noexcept;
 
-  Object(const Object& obj) = delete;
-  Object& operator=(const Object& obj) = delete;
-  Object(Object&& obj) noexcept;
-  Object& operator=(Object&& obj) noexcept;
+  TriangulatedObject(const TriangulatedObject& obj) = delete;
+  TriangulatedObject& operator=(const TriangulatedObject& obj) = delete;
+  TriangulatedObject(TriangulatedObject&& obj) noexcept;
+  TriangulatedObject& operator=(TriangulatedObject&& obj) noexcept;
 
  private:
   void clear() noexcept;
@@ -32,11 +32,13 @@ class Object {
     INDEX_BUFFER = 0,
     POS_VB = 1,
     NORMAL_VB = 2,
-    NUM_BUFFERS = 3
+    COLOR_VB = 3,
+    NUM_BUFFERS = 4
   };
 
   const char POSITION_LOCATION = 0;
   const char NORMAL_LOCATION = 1;
+  const char COLOR_LOCATION = 2;
 
   GLuint VAO_ = 0;
   std::array<GLuint, NUM_BUFFERS> buffers_{};
