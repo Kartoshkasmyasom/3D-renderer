@@ -23,6 +23,8 @@ class TriangulatedObject {
   TriangulatedObject(TriangulatedObject&& obj) noexcept;
   TriangulatedObject& operator=(TriangulatedObject&& obj) noexcept;
 
+  void draw();
+
  private:
   void clear() noexcept;
   void upload_to_gpu(const MeshData& data);

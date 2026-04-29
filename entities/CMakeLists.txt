@@ -9,8 +9,10 @@ add_library(${PROJECT_NAME}
     include/MeshData.hpp
     include/TriangulatedObject.hpp 
     include/Shader.hpp 
+    include/World.hpp
     src/TriangulatedObject.cpp
     src/Shader.cpp
+    src/World.cpp
 )
 target_include_directories(${PROJECT_NAME} PUBLIC 
     ${CMAKE_CURRENT_SOURCE_DIR}/include
