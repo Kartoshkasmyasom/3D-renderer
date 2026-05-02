@@ -9,8 +9,11 @@
 
 const std::string vertexShaderSource = "#version 330 core\n"
   "layout (location = 0) in vec3 aPos;\n"
+  "uniform mat4 model;\n"
+  "uniform mat4 view;\n"
+  "uniform mat4 projection;\n"
   "void main(){\n"
-  "gl_Position = vec4(aPos, 1.0);}\0";
+  "gl_Position = projection * view * model * vec4(aPos, 1.0);}\0";
 
 const std::string fragmentShaderSource = "#version 330 core\n"
   "out vec4 FragColor;\n"
