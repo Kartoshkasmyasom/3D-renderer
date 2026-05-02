@@ -29,6 +29,7 @@ int main() {
   sf::ContextSettings settings;
     settings.majorVersion = 3;
     settings.minorVersion = 3;
+    settings.depthBits = 24;
 
    sf::RenderWindow window(
         sf::VideoMode({800, 600}),
@@ -50,6 +51,7 @@ int main() {
   std::cout << "Version: " << glGetString(GL_VERSION) << "\n";
   std::cout << "Renderer: " << glGetString(GL_RENDERER) << "\n";
   std::cout << "Vendor: " << glGetString(GL_VENDOR) << "\n";
+  glViewport(0, 0, window.getSize().x, window.getSize().y);
 
   Renderer::World world;
   try {
@@ -62,9 +64,10 @@ int main() {
     Renderer::TriangulatedObject object2(std::move(mesh));
     object1.color() = Eigen::Vector4f(1.0f, 0.55f, 0.57f, 1.0f);
     object2.color() = Eigen::Vector4f(0.35f, 0.75f, 1.0f, 1.0f);
-    object2.transform().position = Eigen::Vector3f(0.5f, 0.8f, 0.8f);
+    object2.transform().position = Eigen::Vector3f(1.5f, 0.0f, 0.0f);
     object2.transform().scale = Eigen::Vector3f(0.5f, 0.5f, 0.5f);
-    object2.transform().rotation = Eigen::Vector3f(0.0f, 45.0f, 0.0f);
+    object2.transform().rotation =
+        Eigen::Vector3f(0.0f, Renderer::to_radians(45.0f), 0.0f);
     world.add_object(std::move(object1));
     world.add_object(std::move(object2));
     }
@@ -74,17 +77,22 @@ int main() {
   Renderer::Shader shader(vertexShaderSource, fragmentShaderSource);
 
   Renderer::Camera camera;
+  sf::Clock clock;
 
+  glEnable(GL_DEPTH_TEST);
   bool running = true;
     while (running) {
         while (const auto event = window.pollEvent()) {
             if (event->is<sf::Event::Closed>()) {
                 running = false;
             }
+            if (const auto* resized = event->getIf<sf::Event::Resized>()) {
+                glViewport(0, 0, resized->size.x, resized->size.y);
+            }
         }
 
         glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
-        glClear(GL_COLOR_BUFFER_BIT);
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         shader.use();
         const sf::Vector2u window_size = window.getSize();
         shader.set_mat4("view", camera.view_matrix());
@@ -92,10 +100,17 @@ int main() {
             static_cast<float>(window_size.x),
             static_cast<float>(window_size.y)));
 
+        const float elapsed_time = clock.getElapsedTime().asSeconds();
+        int object_index = 0;
         for(auto it = world.begin(); it != world.end(); ++it) {
+          if (object_index == 1) {
+            it->transform().rotation =
+                Eigen::Vector3f(0.0f, elapsed_time, 0.0f);
+          }
           shader.set_mat4("model", it->transform().matrix());
           shader.set_vec4("objectColor", it->color());
           it->draw();
+          ++object_index;
         }
         window.display(); 
 

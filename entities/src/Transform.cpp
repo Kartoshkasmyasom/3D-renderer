@@ -2,7 +2,7 @@
 
 namespace Renderer {
 
-Matrix4 Transform::matrix() {
+Matrix4 Transform::matrix() const {
   Eigen::Affine3f translation =
       Eigen::Affine3f(Eigen::Translation3f(position));
 

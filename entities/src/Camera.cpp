@@ -5,10 +5,12 @@
 namespace Renderer {
 Matrix4 Camera::view_matrix() const {
     Matrix4 view = Matrix4::Identity();
-    view.block<3, 1>(0, 0) = camera_right_;
-    view.block<3, 1>(0, 1) = camera_up_;
-    view.block<3, 1>(0, 2) = direction_;
-    view.block<3, 1>(0, 3) = -position_;
+    view.block<1, 3>(0, 0) = camera_right_.transpose();
+    view.block<1, 3>(1, 0) = camera_up_.transpose();
+    view.block<1, 3>(2, 0) = direction_.transpose();
+    view(0, 3) = -camera_right_.dot(position_);
+    view(1, 3) = -camera_up_.dot(position_);
+    view(2, 3) = -direction_.dot(position_);
     return view;
 }
 
