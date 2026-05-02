@@ -4,6 +4,7 @@
 #include <GLFW/glfw3.h>
 
 #include "MeshData.hpp"
+#include "Transform.hpp"
 
 #include <array>
 #include <stdexcept>
@@ -24,6 +25,9 @@ class TriangulatedObject {
   TriangulatedObject& operator=(TriangulatedObject&& obj) noexcept;
 
   void draw();
+  Transform& transform();
+  Vector4& color();
+  const Vector4& color() const;
 
  private:
   void clear() noexcept;
@@ -46,5 +50,7 @@ class TriangulatedObject {
   std::array<GLuint, NUM_BUFFERS> buffers_{};
 
   MeshData mesh_data_;
+  Transform transform_;
+  Vector4 color_{1.0f, 0.55f, 0.57f, 1.0f};
 };
 }  // namespace Renderer

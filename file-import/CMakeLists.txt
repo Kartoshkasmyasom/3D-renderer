@@ -16,8 +16,8 @@ target_link_libraries(${PROJECT_NAME}
     PRIVATE
     entities
     glfw
-    assimp
-    sfml-graphics
-    sfml-window
-    sfml-system
+    assimp::assimp
+    SFML::Graphics
+    SFML::Window
+    SFML::System
 )

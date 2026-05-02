@@ -10,7 +10,7 @@ find_package(OpenGL REQUIRED)
 find_package(glfw3 REQUIRED)
 find_package(GLEW REQUIRED)
 find_package(Eigen3 REQUIRED)
-find_package(SFML REQUIRED COMPONENTS graphics window system)
+find_package(SFML REQUIRED COMPONENTS Graphics Window System)
 find_package(assimp REQUIRED)
 
 

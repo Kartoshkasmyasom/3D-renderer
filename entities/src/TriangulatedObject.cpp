@@ -30,6 +30,8 @@ TriangulatedObject::TriangulatedObject(TriangulatedObject&& obj) noexcept {
   std::cout<<"Constructor move\n";
   VAO_ = obj.VAO_;
   buffers_ = obj.buffers_;
+  transform_ = obj.transform_;
+  color_ = obj.color_;
   mesh_data_.meshes = std::exchange(obj.mesh_data_.meshes, {});
     mesh_data_.positions = std::exchange(obj.mesh_data_.positions, {});
     mesh_data_.normals = std::exchange(obj.mesh_data_.normals, {});
@@ -44,6 +46,8 @@ TriangulatedObject& TriangulatedObject::operator=(TriangulatedObject&& obj) noex
     clear();
     VAO_ = obj.VAO_;
     buffers_ = obj.buffers_;
+    transform_ = obj.transform_;
+    color_ = obj.color_;
     mesh_data_.meshes = std::exchange(obj.mesh_data_.meshes, {});
     mesh_data_.positions = std::exchange(obj.mesh_data_.positions, {});
     mesh_data_.normals = std::exchange(obj.mesh_data_.normals, {});
@@ -101,8 +105,20 @@ void TriangulatedObject::draw() {
       GL_TRIANGLES,
       mesh.num_indices, 
       GL_UNSIGNED_INT, 
-      reinterpret_cast<void*>(static_cast<uintptr_t>(mesh.base_index)))
+      reinterpret_cast<void*>(static_cast<uintptr_t>(offset)))
     );
   }
+}
+
+Transform& TriangulatedObject::transform() {
+  return transform_;
+}
+
+Vector4& TriangulatedObject::color() {
+  return color_;
+}
+
+const Vector4& TriangulatedObject::color() const {
+  return color_;
 }
 }  // namespace Renderer
