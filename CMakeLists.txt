@@ -10,6 +10,10 @@ find_package(OpenGL REQUIRED)
 find_package(glfw3 REQUIRED)
 find_package(GLEW REQUIRED)
 find_package(Eigen3 REQUIRED)
+find_package(SFML REQUIRED COMPONENTS graphics window system)
+find_package(assimp REQUIRED)
+
 
 add_subdirectory(entities)
 add_subdirectory(file-import)
+add_subdirectory(project-exceptions)
