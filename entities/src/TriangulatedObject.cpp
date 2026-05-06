@@ -10,7 +10,7 @@ void TriangulatedObject::clear() noexcept {
     VAO_ = 0;
   }
 
-  unsigned int buffer_size = buffers_.size();
+  const GLsizei buffer_size = static_cast<GLsizei>(buffers_.size());
   if (buffers_[0] != 0) {
     glDeleteBuffers(buffer_size, buffers_.data());
   }
@@ -18,7 +18,8 @@ void TriangulatedObject::clear() noexcept {
   mesh_data_.clear();
 }
 
-TriangulatedObject::TriangulatedObject(MeshData&& data) : mesh_data_(std::move(data)) {
+TriangulatedObject::TriangulatedObject(MeshData&& data)
+    : mesh_data_(std::move(data)) {
   upload_to_gpu(mesh_data_);
 }
 
@@ -62,6 +63,11 @@ void TriangulatedObject::upload_to_gpu(const MeshData& data) {
   if (data.positions.empty() || data.indices.empty()) {
     throw std::runtime_error("Could not upload empty mesh on GPU!");
   }
+  if (data.normals.size() != data.positions.size()) {
+    throw std::runtime_error(
+        "Could not upload mesh on GPU: normals count does not match positions "
+        "count!");
+  }
 
   glGenVertexArrays(1, &VAO_);
   GL_CHECK(glBindVertexArray(VAO_));
@@ -77,16 +83,14 @@ void TriangulatedObject::upload_to_gpu(const MeshData& data) {
   GL_CHECK(glVertexAttribPointer(POSITION_LOCATION, 3, GL_FLOAT, GL_FALSE,
                         sizeof(Vector3), 0));
 
-  if (!data.normals.empty()) {
-    glBindBuffer(GL_ARRAY_BUFFER, buffers_[NORMAL_VB]);
-    GL_CHECK(glBufferData(
-        GL_ARRAY_BUFFER,
-        static_cast<GLsizeiptr>(sizeof(data.normals[0]) * data.normals.size()),
-        &data.normals[0], GL_STATIC_DRAW));
-    glEnableVertexAttribArray(NORMAL_LOCATION);
-    GL_CHECK(glVertexAttribPointer(NORMAL_LOCATION, 3, GL_FLOAT, GL_FALSE,
-                          sizeof(Vector3), 0));
-  }
+  GL_CHECK(glBindBuffer(GL_ARRAY_BUFFER, buffers_[NORMAL_VB]));
+  GL_CHECK(glBufferData(
+      GL_ARRAY_BUFFER,
+      static_cast<GLsizeiptr>(sizeof(data.normals[0]) * data.normals.size()),
+      data.normals.data(), GL_STATIC_DRAW));
+  GL_CHECK(glEnableVertexAttribArray(NORMAL_LOCATION));
+  GL_CHECK(glVertexAttribPointer(NORMAL_LOCATION, 3, GL_FLOAT, GL_FALSE,
+                                 sizeof(Vector3), 0));
 
   glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, buffers_[INDEX_BUFFER]);
   GL_CHECK(glBufferData(

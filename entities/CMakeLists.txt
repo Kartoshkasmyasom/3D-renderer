@@ -3,7 +3,6 @@ cmake_minimum_required(VERSION 3.10)
 project(entities)
 
 set(CMAKE_CXX_STANDARD 17)
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++17")
 
 add_library(${PROJECT_NAME} 
     include/MeshData.hpp
@@ -12,11 +11,19 @@ add_library(${PROJECT_NAME}
     include/Transform.hpp
     include/World.hpp
     include/Camera.hpp
+    include/AmbientLight.hpp
+    include/DirectionalLight.hpp
+    include/Window.hpp
+    include/Renderer.hpp
     src/TriangulatedObject.cpp
     src/Shader.cpp
     src/Transform.cpp
     src/World.cpp
     src/Camera.cpp
+    src/AmbientLight.cpp
+    src/DirectionalLight.cpp
+    src/Window.cpp
+    src/Renderer.cpp
 )
 target_include_directories(${PROJECT_NAME} PUBLIC 
     ${CMAKE_CURRENT_SOURCE_DIR}/include
@@ -28,5 +35,8 @@ target_link_libraries(${PROJECT_NAME}
     OpenGL::GL
     GLEW::GLEW
     Eigen3::Eigen
+    SFML::Graphics
+    SFML::Window
+    SFML::System
     project-exceptions
 )

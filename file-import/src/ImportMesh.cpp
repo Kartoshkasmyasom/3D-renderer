@@ -30,6 +30,8 @@ void import_single_mesh(const aiMesh* mesh, MeshData& data) {
     if (mesh->HasNormals()) {
       const aiVector3D& normal = mesh->mNormals[i];
       data.normals.push_back(Vector3(normal.x, normal.y, normal.z));
+    } else {
+      data.normals.push_back(Vector3(0.0f, 1.0f, 0.0f));
     }
   }
 

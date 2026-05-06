@@ -1,3 +1,4 @@
 {
-  "cmake.sourceDirectory": "/home/nasty/Workspace/VSCodeprojects/3d-renderer/file-import/assimp/contrib/googletest/googlemock"
+  "cmake.sourceDirectory": "${workspaceFolder}",
+  "cmake.buildDirectory": "${workspaceFolder}/build"
 }
