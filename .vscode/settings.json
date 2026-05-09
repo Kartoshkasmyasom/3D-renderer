@@ -1,4 +1,19 @@
 {
-  "cmake.sourceDirectory": "${workspaceFolder}",
-  "cmake.buildDirectory": "${workspaceFolder}/build"
+  "cmake.sourceDirectory": "${workspaceFolder}/src",
+  "cmake.buildDirectory": "${workspaceFolder}/build-vcpkg",
+  "cmake.configureSettings": {
+    "CMAKE_TOOLCHAIN_FILE": "C:/vcpkg/scripts/buildsystems/vcpkg.cmake"
+  },
+  "C_Cpp.clang_format_path": "C:/Program Files/Microsoft Visual Studio/18/Insiders/VC/Tools/Llvm/x64/bin/clang-format.exe",
+  "C_Cpp.clang_format_style": "file",
+  "C_Cpp.clang_format_fallbackStyle": "Google",
+  "[cpp]": {
+    "editor.formatOnSave": true
+  },
+  "[h]": {
+    "editor.formatOnSave": true
+  },
+  "[hpp]": {
+    "editor.formatOnSave": true
+  }
 }

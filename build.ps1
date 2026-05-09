@@ -22,4 +22,19 @@ if (-not $cmake) {
   throw "CMake was not found. Install CMake or add cmake.exe to PATH."
 }
 
-& $cmake --build build --config Debug
+$buildDir = "build-vcpkg"
+$configureArgs = @("-S", "src", "-B", $buildDir)
+$vcpkgToolchain = "C:\vcpkg\scripts\buildsystems\vcpkg.cmake"
+if (Test-Path $vcpkgToolchain) {
+  $configureArgs += "-DCMAKE_TOOLCHAIN_FILE=$vcpkgToolchain"
+}
+
+& $cmake @configureArgs
+if ($LASTEXITCODE -ne 0) {
+  exit $LASTEXITCODE
+}
+
+& $cmake --build $buildDir --config Debug
+if ($LASTEXITCODE -ne 0) {
+  exit $LASTEXITCODE
+}
