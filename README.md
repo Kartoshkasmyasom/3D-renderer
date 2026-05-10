@@ -2,35 +2,30 @@
 
 Небольшой 3D-renderer на C++17, CMake, OpenGL, GLEW, SFML, Eigen и Assimp.
 
-Проект собирается в исполняемый файл `3d-renderer`. Все зависимости нужно
-установить заранее: CMake ожидает, что заголовочные файлы и библиотеки уже
-доступны в системе.
-
-## Зависимости
-
-Для сборки нужны:
-
-- `assimp` - импорт 3D-моделей.
-- `eigen3` - математические операции.
-- `glew` - работа с расширениями OpenGL.
-- `sfml` - окно, графика и системные функции.
-- OpenGL.
+Проект собирается в исполняемый файл `3d-renderer`. Зависимости описаны в
+`vcpkg.json`: при сборке через vcpkg CMake установит нужные библиотеки в окружение
+сборки.
 
 ## Что нужно установить один раз
 
 ### Windows
 
-1. Установите компилятор:
-   - Visual Studio 2022+ с компонентом **Desktop development with C++** или mingw-w64.
-2. Установите CMake.
-3. Установите библиотеки `assimp`, `eigen3`, `glew` и `sfml` под тот же
-   компилятор, которым будете собирать проект.
+Для сборки под Windows допускается использование mingw-w64. Также проект можно
+собрать через Visual Studio 2022, если установлен компонент C++.
 
-Если библиотеки установлены не в системные пути, передайте их расположение в
-CMake через `CMAKE_PREFIX_PATH`. Например:
+1. Установите Visual Studio 2022 с компонентом **Desktop development with C++**.
+2. Установите CMake, если он не был установлен вместе с Visual Studio.
+3. Установите vcpkg:
 
 ```powershell
-cmake -S .\src -B .\build -DCMAKE_BUILD_TYPE=Debug -DCMAKE_PREFIX_PATH="C:\libs\assimp;C:\libs\eigen3;C:\libs\glew;C:\libs\sfml"
+git clone https://github.com/microsoft/vcpkg C:\vcpkg
+C:\vcpkg\bootstrap-vcpkg.bat
+```
+
+Если vcpkg лежит не в `C:\vcpkg`, укажите путь к нему:
+
+```powershell
+$env:VCPKG_ROOT = "C:\path\to\vcpkg"
 ```
 
 ### Linux Ubuntu
@@ -38,17 +33,24 @@ cmake -S .\src -B .\build -DCMAKE_BUILD_TYPE=Debug -DCMAKE_PREFIX_PATH="C:\libs\
 Для сборки под Linux нужен `gcc/g++` версии 12 или новее либо `clang/clang++`
 версии 16.0.0 или новее.
 
-1. Установите инструменты сборки и OpenGL:
+1. Установите инструменты сборки:
 
 ```bash
 sudo apt update
-sudo apt install -y build-essential cmake git pkg-config libgl1-mesa-dev
+sudo apt install -y build-essential cmake git pkg-config zip unzip tar curl libgl1-mesa-dev libx11-dev libxrandr-dev libxi-dev libudev-dev libfreetype-dev libopenal-dev libflac-dev libvorbis-dev
 ```
 
-2. Установите зависимости проекта:
+2. Установите vcpkg:
 
 ```bash
-sudo apt install -y libassimp-dev libeigen3-dev libglew-dev libsfml-dev
+git clone https://github.com/microsoft/vcpkg "$HOME/vcpkg"
+"$HOME/vcpkg/bootstrap-vcpkg.sh"
+```
+
+Если vcpkg лежит не в `$HOME/vcpkg`, укажите путь к нему:
+
+```bash
+export VCPKG_ROOT="/path/to/vcpkg"
 ```
 
 ## Сборка и запуск
@@ -63,21 +65,21 @@ cd 3D-renderer
 Откройте PowerShell в папке проекта и выполните:
 
 ```powershell
-cmake -S .\src -B .\build -DCMAKE_BUILD_TYPE=Debug
-cmake --build .\build --config Debug
+.\build.ps1
 ```
 
-Если CMake не находит зависимости, укажите путь к ним:
+Если PowerShell пишет, что выполнение сценариев отключено, запустите так:
 
 ```powershell
-cmake -S .\src -B .\build -DCMAKE_BUILD_TYPE=Debug -DCMAKE_PREFIX_PATH="C:\path\to\dependencies"
-cmake --build .\build --config Debug
+powershell -ExecutionPolicy Bypass -File .\build.ps1
 ```
 
-Чтобы запустить приложение:
+Скрипт запустит CMake, прочитает зависимости из `vcpkg.json` и соберет проект.
+
+Чтобы запустить само приложение:
 
 ```powershell
-.\build\Debug\3d-renderer.exe
+.\build-vcpkg\Debug\3d-renderer.exe
 ```
 
 ### Linux Ubuntu
@@ -85,12 +87,26 @@ cmake --build .\build --config Debug
 Откройте терминал в папке проекта и выполните:
 
 ```bash
-cmake -S ./src -B ./build -DCMAKE_BUILD_TYPE=Debug
-cmake --build ./build
+chmod +x ./build.sh
+./build.sh
 ```
 
-Чтобы запустить приложение:
+Скрипт запустит CMake, прочитает зависимости из `vcpkg.json` и соберет проект.
+
+Чтобы запустить само приложение:
 
 ```bash
-./build/3d-renderer
+./build-vcpkg/3d-renderer
 ```
+
+## Где лежат зависимости
+
+Список библиотек проекта находится в файле `vcpkg.json`:
+
+- `assimp` - импорт 3D-моделей.
+- `eigen3` - математические операции.
+- `glew` - работа с расширениями OpenGL.
+- `sfml` - окно, графика и системные функции.
+
+Если понадобится новая библиотека, ее нужно добавить в `vcpkg.json`, после чего
+заново запустить сборку.
