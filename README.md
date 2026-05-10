@@ -21,8 +21,7 @@
 ### Windows
 
 1. Установите компилятор:
-   - Visual Studio 2022 с компонентом **Desktop development with C++**; или
-   - mingw-w64.
+   - Visual Studio 2022+ с компонентом **Desktop development with C++**; или mingw-w64.
 2. Установите CMake.
 3. Установите библиотеки `assimp`, `eigen3`, `glew` и `sfml` под тот же
    компилятор, которым будете собирать проект.
