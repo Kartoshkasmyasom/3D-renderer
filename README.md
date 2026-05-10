@@ -8,9 +8,9 @@
 
 ### Windows
 
-Для сборки под Windows допускается использование mingw-w64. Также проект можно собрать через Visual Studio 2022, если установлен компонент C++.
+Для сборки под Windows допускается использование mingw-w64. Также проект можно собрать через Visual Studio 2022+, если установлен компонент C++.
 
-1. Установите Visual Studio 2022 с компонентом **Desktop development with C++**.
+1. Установите Visual Studio 2022+ с компонентом **Desktop development with C++**.
 2. Установите CMake, если он не был установлен вместе с Visual Studio.
 3. Установите vcpkg:
 
