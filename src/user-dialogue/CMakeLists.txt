@@ -8,8 +8,8 @@ add_library(${PROJECT_NAME}
             src/Dialogue.cpp
             src/Parser.cpp
             include/Dialogue.hpp
-            include/Parser.hpp
-            include/Token.hpp)
+            include/Parser.hpp)
 
 target_include_directories(${PROJECT_NAME}
-                           PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include)
+                           PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include
+                                  ${CMAKE_SOURCE_DIR}/entities/include)

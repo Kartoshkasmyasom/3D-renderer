@@ -22,12 +22,26 @@ if (-not $cmake) {
   throw "CMake was not found. Install CMake or add cmake.exe to PATH."
 }
 
-$buildDir = "build-vcpkg"
-$configureArgs = @("-S", "src", "-B", $buildDir)
-$vcpkgToolchain = "C:\vcpkg\scripts\buildsystems\vcpkg.cmake"
-if (Test-Path $vcpkgToolchain) {
-  $configureArgs += "-DCMAKE_TOOLCHAIN_FILE=$vcpkgToolchain"
+$repoRoot = $PSScriptRoot
+$buildDir = Join-Path $repoRoot "build-vcpkg"
+$sourceDir = Join-Path $repoRoot "src"
+
+$vcpkgRoot = $env:VCPKG_ROOT
+if (-not $vcpkgRoot) {
+  $vcpkgRoot = "C:\vcpkg"
 }
+
+$vcpkgToolchain = Join-Path $vcpkgRoot "scripts\buildsystems\vcpkg.cmake"
+if (-not (Test-Path $vcpkgToolchain)) {
+  throw "vcpkg toolchain was not found: $vcpkgToolchain. Install vcpkg or set VCPKG_ROOT to the folder where vcpkg is installed."
+}
+
+$configureArgs = @(
+  "-S", $sourceDir,
+  "-B", $buildDir,
+  "-DCMAKE_TOOLCHAIN_FILE=$vcpkgToolchain",
+  "-DVCPKG_MANIFEST_DIR=$repoRoot"
+)
 
 & $cmake @configureArgs
 if ($LASTEXITCODE -ne 0) {

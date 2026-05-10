@@ -1,0 +1,10 @@
+{
+  "name": "3d-renderer",
+  "version-string": "0.1.0",
+  "dependencies": [
+    "assimp",
+    "eigen3",
+    "glew",
+    "sfml"
+  ]
+}

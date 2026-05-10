@@ -21,7 +21,7 @@ add_library(${PROJECT_NAME}
     src/World.cpp
     src/Camera.cpp
     src/light/AmbientLight.cpp
-    src/light/DirectionalLight.cpp
+    src/DirectionalLight.cpp
     src/Window.cpp
     src/Renderer.cpp
 )
