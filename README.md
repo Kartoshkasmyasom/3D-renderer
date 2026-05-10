@@ -50,7 +50,10 @@ export VCPKG_ROOT="/path/to/vcpkg"
 ```
 
 ## Сборка и запуск
-
+```bash
+git clone https://github.com/Kartoshkasmyasom/3D-renderer.git
+cd 3D-renderer
+```
 ### Windows
 
 Откройте PowerShell в папке проекта и выполните:
