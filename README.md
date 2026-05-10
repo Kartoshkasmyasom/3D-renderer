@@ -22,7 +22,7 @@ C:\vcpkg\bootstrap-vcpkg.bat
 Если vcpkg лежит не в `C:\vcpkg`, укажите путь к нему:
 
 ```powershell
-$env:VCPKG_ROOT = "D:\path\to\vcpkg"
+$env:VCPKG_ROOT = "C:\path\to\vcpkg"
 ```
 
 ### Linux Ubuntu
