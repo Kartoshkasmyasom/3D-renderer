@@ -50,7 +50,10 @@ export VCPKG_ROOT="/path/to/vcpkg"
 ```
 
 ## Сборка и запуск
-
+```bash
+git clone https://github.com/Kartoshkasmyasom/3D-renderer.git
+cd 3D-renderer
+```
 ### Windows
 
 Откройте PowerShell в папке проекта и выполните:
@@ -72,7 +75,6 @@ powershell -ExecutionPolicy Bypass -File .\build.ps1
 ```powershell
 .\build-vcpkg\Debug\3d-renderer.exe
 ```
-
 ### Linux Ubuntu
 
 Откройте терминал в папке проекта и выполните:
