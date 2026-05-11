@@ -1,8 +1,8 @@
 #pragma once
 
-#include "ActionTraits.hpp"
 #include "Camera.hpp"
 #include "Dialogue.hpp"
+#include "EditSubsystem.hpp"
 #include "Importer.hpp"
 #include "ModelContext.hpp"
 #include "Renderer.hpp"
@@ -37,13 +37,11 @@ enum class KeyboardAction {
 
 class App {
  public:
-  static constexpr std::string_view help_rendering =
+  static const std::string help_rendering =
       "Rendering mode is active.\n"
-      "Use W/S to move forward/backward, A/D to move left/right, and arrow "
-      "keys to rotate the camera.\n"
       "Press E to enter edit mode.";
 
-  static constexpr std::string_view help_edit =
+  static const std::string help_edit =
       "Edit mode is active.\n"
       "Use Left/Right to select objects. Press + to import, C to change color, "
       "P to change position, S to change scale, R to change rotation, Delete "
@@ -63,12 +61,6 @@ class App {
   template <ConsoleAction Action>
   void handle_console_command();
 
-  Window window_;
-  World world_;
-  Camera camera_;
-  Renderer renderer_;
-  Importer importer_;
-  Dialogue dialogue_;
   ModelContext model_context_;
   UIContext ui_context_;
   AppState state_ = AppState::Rendering;
