@@ -18,23 +18,23 @@ App::App()
       dialogue_(),
       model_context_{world_, camera_, renderer_, importer_},
       ui_context_{window_, dialogue_} {
-  const auto window_size = window_.size();
-  dialogue_.print_message("Window resolution: " +
-                          std::to_string(window_size.x) + "x" +
-                          std::to_string(window_size.y));
-  dialogue_.print_message(help_rendering);
+  const auto window_size = ui_context_.window.size();
+  ui_context_.dialogue.print_message("Window resolution: " +
+                                     std::to_string(window_size.x) + "x" +
+                                     std::to_string(window_size.y));
+  ui_context_.dialogue.print_message(help_rendering);
 }
 
 void App::switch_state(AppState next_state) {
   state_ = next_state;
 
   if (state_ == AppState::Rendering) {
-    dialogue_.print_message(help_rendering);
+    ui_context_.dialogue.print_message(help_rendering);
     return;
   }
 
   if (state_ == AppState::Edit) {
-    dialogue_.print_message(help_edit);
+    ui_context_.dialogue.print_message(help_edit);
   }
 }
 
@@ -45,36 +45,37 @@ void App::update_camera(float delta_time) {
   const float movement = movement_speed * delta_time;
   const float rotation = rotation_speed * delta_time;
 
-  if (window_.is_key_pressed(sf::Keyboard::Key::W)) {
-    camera_.move_forward(movement);
+  if (ui_context_.window.is_key_pressed(sf::Keyboard::Key::W)) {
+    model_context_.camera.move_forward(movement);
   }
-  if (window_.is_key_pressed(sf::Keyboard::Key::S)) {
-    camera_.move_forward(-movement);
+  if (ui_context_.window.is_key_pressed(sf::Keyboard::Key::S)) {
+    model_context_.camera.move_forward(-movement);
   }
-  if (window_.is_key_pressed(sf::Keyboard::Key::D)) {
-    camera_.move_right(movement);
+  if (ui_context_.window.is_key_pressed(sf::Keyboard::Key::D)) {
+    model_context_.camera.move_right(movement);
   }
-  if (window_.is_key_pressed(sf::Keyboard::Key::A)) {
-    camera_.move_right(-movement);
+  if (ui_context_.window.is_key_pressed(sf::Keyboard::Key::A)) {
+    model_context_.camera.move_right(-movement);
   }
 
-  if (window_.is_key_pressed(sf::Keyboard::Key::Left)) {
-    camera_.rotate_yaw(-rotation);
+  if (ui_context_.window.is_key_pressed(sf::Keyboard::Key::Left)) {
+    model_context_.camera.rotate_yaw(-rotation);
   }
-  if (window_.is_key_pressed(sf::Keyboard::Key::Right)) {
-    camera_.rotate_yaw(rotation);
+  if (ui_context_.window.is_key_pressed(sf::Keyboard::Key::Right)) {
+    model_context_.camera.rotate_yaw(rotation);
   }
-  if (window_.is_key_pressed(sf::Keyboard::Key::Up)) {
-    camera_.rotate_pitch(rotation);
+  if (ui_context_.window.is_key_pressed(sf::Keyboard::Key::Up)) {
+    model_context_.camera.rotate_pitch(rotation);
   }
-  if (window_.is_key_pressed(sf::Keyboard::Key::Down)) {
-    camera_.rotate_pitch(-rotation);
+  if (ui_context_.window.is_key_pressed(sf::Keyboard::Key::Down)) {
+    model_context_.camera.rotate_pitch(-rotation);
   }
 }
 
 void App::render_frame(const TriangulatedObject* highlighted_object) {
-  renderer_.draw_scene(window_.size(), highlighted_object);
-  window_.display();
+  model_context_.renderer.draw_scene(ui_context_.window.size(),
+                                     highlighted_object);
+  ui_context_.window.display();
 }
 
 void App::print_frame_time(float delta_time, float& accumulator) const {
@@ -92,19 +93,19 @@ int App::run() {
     sf::Clock clock;
     float frame_time_accumulator = 0.0f;
 
-    while (window_.is_running()) {
+    while (ui_context_.window.is_running()) {
       const float delta_time = clock.restart().asSeconds();
       KeyboardAction keyboard_action = KeyboardAction::None;
 
-      while (auto event = window_.poll_event()) {
-        window_.handle_event(*event);
+      while (auto event = ui_context_.window.poll_event()) {
+        ui_context_.window.handle_event(*event);
         const KeyboardAction next_action = action_from_event(*event);
         if (next_action != KeyboardAction::None) {
           keyboard_action = next_action;
         }
       }
 
-      if (!window_.is_running()) {
+      if (!ui_context_.window.is_running()) {
         continue;
       }
 
@@ -127,13 +128,13 @@ int App::run() {
             break;
           }
           if (keyboard_action == KeyboardAction::NextObject &&
-              !world_.empty()) {
-            world_.select_next_object();
+              !model_context_.world.empty()) {
+            model_context_.world.select_next_object();
             break;
           }
           if (keyboard_action == KeyboardAction::PreviousObject &&
-              !world_.empty()) {
-            world_.select_previous_object();
+              !model_context_.world.empty()) {
+            model_context_.world.select_previous_object();
             break;
           }
           if (keyboard_action == KeyboardAction::Import) {
@@ -161,7 +162,7 @@ int App::run() {
             break;
           }
 
-          render_frame(world_.selected_object());
+          render_frame(model_context_.world.selected_object());
           print_frame_time(delta_time, frame_time_accumulator);
           break;
         }
@@ -224,8 +225,8 @@ KeyboardAction App::action_from_event(const sf::Event& event) const {
 template <ConsoleAction Action>
 void App::handle_console_command() {
   if constexpr (Action != ConsoleAction::ImportObject) {
-    if (world_.empty()) {
-      dialogue_.print_message("No selected object.");
+    if (model_context_.world.empty()) {
+      ui_context_.dialogue.print_message("No selected object.");
       return;
     }
   }
@@ -234,16 +235,17 @@ void App::handle_console_command() {
   using Validator = typename ConsoleActionTraits<Action>::Validator;
   using ConsoleCommand = typename ConsoleActionTraits<Action>::ConsoleCommand;
 
-  auto request = dialogue_.get_user_request(Messages{}, Validator{});
+  auto request =
+      ui_context_.dialogue.get_user_request(Messages{}, Validator{});
   if (!request.has_value()) {
     return;
   }
 
   ConsoleCommand command;
   try {
-    dialogue_.print_message("Applying changes...");
+    ui_context_.dialogue.print_message("Applying changes...");
     command.execute(model_context_, *request);
-    dialogue_.print_message("Success!");
+    ui_context_.dialogue.print_message("Success!");
   } catch (const std::runtime_error& e) {
     throw std::runtime_error(std::string("Failed to execute command: ") +
                              e.what());
