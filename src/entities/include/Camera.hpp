@@ -39,7 +39,7 @@ class Camera {
   Vector3 forward_;
   Vector3 right_;
   Vector3 up_;
-  Vector3 world_up_{0.0f, 1.0f, 0.0f};
+  const Vector3 world_up_{0.0f, 1.0f, 0.0f};
   float fov_degrees_;
   float z_near_;
   float z_far_;
