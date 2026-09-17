@@ -1,7 +1,7 @@
-#include "GlCheck.hpp"
-
 #include <iostream>
 #include <string>
+
+#include "GlCheck.hpp"
 
 namespace Renderer {
 

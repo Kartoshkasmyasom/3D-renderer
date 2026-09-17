@@ -9,6 +9,6 @@ add_library(${PROJECT_NAME} src/Importer.cpp include/Importer.hpp)
 target_include_directories(
   ${PROJECT_NAME}
   PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include
-  PRIVATE ${CMAKE_SOURCE_DIR}/entities/include)
+  PRIVATE ${CMAKE_SOURCE_DIR}/world/include)
 
-target_link_libraries(${PROJECT_NAME} PUBLIC assimp::assimp entities)
+target_link_libraries(${PROJECT_NAME} PUBLIC assimp::assimp world)

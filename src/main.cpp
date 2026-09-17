@@ -1,7 +1,7 @@
-#include "App.hpp"
-
 #include <exception>
 #include <iostream>
+
+#include "App.hpp"
 
 int main() {
   try {

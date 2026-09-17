@@ -1,38 +1,21 @@
 #pragma once
 
+#include <SFML/Window/Keyboard.hpp>
+#include <set>
+#include <string_view>
+
 #include "ActionTraits.hpp"
-#include "Camera.hpp"
 #include "Dialogue.hpp"
 #include "Importer.hpp"
-#include "ModelContext.hpp"
 #include "Renderer.hpp"
-#include "UIContext.hpp"
 #include "Window.hpp"
 #include "World.hpp"
-
-#include <SFML/Window/Event.hpp>
-
-#include <string_view>
 
 namespace Renderer {
 
 enum class AppState {
   Rendering,
   Edit,
-};
-
-enum class KeyboardAction {
-  None,
-  Import,
-  Edit,
-  Back,
-  NextObject,
-  PreviousObject,
-  Color,
-  Position,
-  Scale,
-  Rotation,
-  Delete,
 };
 
 class App {
@@ -54,24 +37,23 @@ class App {
   int run();
 
  private:
-  KeyboardAction action_from_event(const sf::Event& event) const;
   void switch_state(AppState next_state);
-  void update_camera(float delta_time);
   void render_frame(const TriangulatedObject* highlighted_object = nullptr);
-  void print_frame_time(float delta_time, float& accumulator) const;
 
-  template <ConsoleAction Action>
+  template <Action action>
   void handle_console_command();
 
+  template <Action action>
+  void handle_keyboard_command();
+
   Window window_;
-  World world_;
-  Camera camera_;
-  Renderer renderer_;
   Importer importer_;
+  World world_;
+  Renderer renderer_;
   Dialogue dialogue_;
-  ModelContext model_context_;
-  UIContext ui_context_;
   AppState state_ = AppState::Rendering;
+  std::set<sf::Keyboard::Key> pressed_keys_;
+  float delta_time_ = 0.0f;
 };
 
 }  // namespace Renderer
