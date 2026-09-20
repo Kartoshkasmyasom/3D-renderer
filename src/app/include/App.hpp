@@ -52,6 +52,7 @@ class App {
   int run();
 
  private:
+  KeyboardAction process_user_input();
   KeyboardAction action_from_event(const sf::Event& event) const;
   void switch_state(AppState next_state);
   void update_camera(float delta_time);
