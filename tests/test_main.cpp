@@ -78,15 +78,17 @@ template <Action action>
 void check_triplet_range(
     float minimum, float maximum, std::vector<RangeCase> cases,
     const std::array<float Validator<action>::Request::*, 3>& fields) {
-  const float middle = (minimum + maximum) / 2.0f;
+  constexpr bool whole_numbers = action == Action::ChangeColor;
+  const float middle = whole_numbers ? std::floor((minimum + maximum) / 2.0f)
+                                     : (minimum + maximum) / 2.0f;
   const float infinity = std::numeric_limits<float>::infinity();
   cases.insert(cases.end(), {
       {middle, true},
       {minimum, true},
       {maximum, true},
       {std::nextafter(minimum, -infinity), false},
-      {std::nextafter(minimum, maximum), true},
-      {std::nextafter(maximum, minimum), true},
+      {std::nextafter(minimum, maximum), !whole_numbers},
+      {std::nextafter(maximum, minimum), !whole_numbers},
       {std::nextafter(maximum, infinity), false},
       {std::numeric_limits<float>::lowest(), false},
       {std::numeric_limits<float>::max(), false},
@@ -127,7 +129,8 @@ void change_color_checks_range_boundaries() {
   check_triplet_range<Action::ChangeColor>(
       0.0f, 255.0f,
       {{-1.0f, false}, {1.0f, true}, {254.0f, true}, {256.0f, false},
-       {-100.0f, false}, {1000.0f, false}},
+       {-100.0f, false}, {1000.0f, false}, {0.5f, false},
+       {127.5f, false}, {254.5f, false}},
       {&Request::r, &Request::g, &Request::b});
 }
 

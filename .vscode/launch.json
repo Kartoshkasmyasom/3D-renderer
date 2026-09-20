@@ -2,15 +2,27 @@
   "version": "0.2.0",
   "configurations": [
     {
-      "name": "Debug file-import",
+      "name": "Debug renderer",
       "type": "cppvsdbg",
       "request": "launch",
-      "program": "${workspaceFolder}\\build\\file-import\\Debug\\file-import.exe",
+      "program": "${workspaceFolder}\\build-vcpkg\\Debug\\3d-renderer.exe",
       "args": [],
       "stopAtEntry": false,
       "cwd": "${workspaceFolder}",
       "environment": [],
       "externalConsole": true,
+      "preLaunchTask": "cmake: build Debug"
+    },
+    {
+      "name": "Debug tests",
+      "type": "cppvsdbg",
+      "request": "launch",
+      "program": "${workspaceFolder}\\build-vcpkg\\tests\\Debug\\renderer_tests.exe",
+      "args": [],
+      "stopAtEntry": false,
+      "cwd": "${workspaceFolder}",
+      "environment": [],
+      "externalConsole": false,
       "preLaunchTask": "cmake: build Debug"
     }
   ]

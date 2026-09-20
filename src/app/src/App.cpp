@@ -57,6 +57,11 @@ int App::run() {
       while (auto event = window_.poll_event()) {
         if (event->is<sf::Event::Closed>()) {
           window_.render_window().close();
+          return 0;
+        }
+        if (event->is<sf::Event::FocusLost>()) {
+          pressed_keys_.clear();
+          action = Action::None;
         }
         if (const auto* resized = event->getIf<sf::Event::Resized>()) {
           glViewport(0, 0, resized->size.x, resized->size.y);
@@ -236,6 +241,8 @@ void App::handle_console_command() {
     while (auto event = window_.poll_event()) {
       if (event->is<sf::Event::Closed>()) {
         window_.render_window().close();
+        pressed_keys_.clear();
+        return;
       }
       if (const auto* resized = event->getIf<sf::Event::Resized>()) {
         glViewport(0, 0, resized->size.x, resized->size.y);

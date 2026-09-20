@@ -21,6 +21,10 @@ floats inside/outside each endpoint, distant out-of-range values, and the lowest
 and highest finite floats. Scale also explicitly rejects zero. Accepted values
 are checked for exact preservation in every request component.
 
+RGB channels must be whole numbers: their midpoint is rounded down to 127,
+and fractional values (including floats just inside the endpoints) are rejected
+on each channel independently.
+
 Movement tests additionally pass input through the parser, validator, and move
 command for all eight octants, both directions of each axis, all four sign
 combinations in each coordinate plane, and zero displacement. Each case checks

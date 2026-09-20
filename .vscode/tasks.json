@@ -4,7 +4,7 @@
     {
       "label": "cmake: build Debug",
       "type": "shell",
-      "command": "& 'C:\\Program Files\\Microsoft Visual Studio\\18\\Insiders\\Common7\\IDE\\CommonExtensions\\Microsoft\\CMake\\CMake\\bin\\cmake.exe' --build build --config Debug",
+      "command": "& 'C:\\Program Files\\Microsoft Visual Studio\\18\\Insiders\\Common7\\IDE\\CommonExtensions\\Microsoft\\CMake\\CMake\\bin\\cmake.exe' --build build-vcpkg --config Debug --parallel",
       "options": {
         "cwd": "${workspaceFolder}"
       },
@@ -15,9 +15,9 @@
       "problemMatcher": "$msCompile"
     },
     {
-      "label": "run file-import",
+      "label": "run renderer",
       "type": "shell",
-      "command": "${workspaceFolder}\\build\\file-import\\Debug\\file-import.exe",
+      "command": "& '${workspaceFolder}\\build-vcpkg\\Debug\\3d-renderer.exe'",
       "options": {
         "cwd": "${workspaceFolder}"
       },
