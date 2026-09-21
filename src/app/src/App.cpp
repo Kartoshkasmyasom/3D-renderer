@@ -33,18 +33,19 @@ void App::switch_state(AppState next_state) {
   state_ = next_state;
 
   if (state_ == AppState::Rendering) {
-    dialogue_.print_message(help_rendering);
+    ui_context_.dialogue.print_message(help_rendering);
     return;
   }
 
   if (state_ == AppState::Edit) {
-    dialogue_.print_message(help_edit);
+    ui_context_.dialogue.print_message(help_edit);
   }
 }
 
 void App::render_frame(const TriangulatedObject* highlighted_object) {
-  renderer_.draw_scene(window_.size(), highlighted_object);
-  window_.display();
+  model_context_.renderer.draw_scene(ui_context_.window.size(),
+                                     highlighted_object);
+  ui_context_.window.display();
 }
 
 int App::run() {
@@ -117,7 +118,7 @@ int App::run() {
         }
       }
 
-      if (!window_.is_running()) {
+      if (!ui_context_.window.is_running()) {
         continue;
       }
       switch (state_) {
