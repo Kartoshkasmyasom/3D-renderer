@@ -2,8 +2,8 @@
 
 #include <assimp/postprocess.h>
 #include <assimp/scene.h>
-#include <assimp/Importer.hpp>
 
+#include <assimp/Importer.hpp>
 #include <stdexcept>
 
 namespace Renderer {

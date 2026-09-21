@@ -1,28 +1,32 @@
 #include "App.hpp"
 
-#include <SFML/System/Clock.hpp>
-#include <SFML/Window/Event.hpp>
+#include <GL/glew.h>
 
+#include <SFML/System/Clock.hpp>
+#include <SFML/System/Sleep.hpp>
+#include <SFML/Window/Event.hpp>
 #include <iostream>
 #include <stdexcept>
 #include <string>
+#include <type_traits>
+#include <utility>
+
+#include "MessageTraits.hpp"
+#include "Validators.hpp"
 
 namespace Renderer {
 
 App::App()
     : window_(800, 600, "test"),
-      world_(),
-      camera_(),
-      renderer_(world_, camera_),
       importer_(),
-      dialogue_(),
-      model_context_{world_, camera_, renderer_, importer_},
-      ui_context_{window_, dialogue_} {
-  const auto window_size = ui_context_.window.size();
-  ui_context_.dialogue.print_message("Window resolution: " +
-                                     std::to_string(window_size.x) + "x" +
-                                     std::to_string(window_size.y));
-  ui_context_.dialogue.print_message(help_rendering);
+      world_(),
+      renderer_(world_),
+      dialogue_() {
+  const auto window_size = window_.size();
+  dialogue_.print_message(
+      "Window resolution: " + std::to_string(window_size.x) + "x" +
+      std::to_string(window_size.y));
+  dialogue_.print_message(help_rendering);
 }
 
 void App::switch_state(AppState next_state) {
@@ -38,132 +42,175 @@ void App::switch_state(AppState next_state) {
   }
 }
 
-void App::update_camera(float delta_time) {
-  constexpr float movement_speed = 3.0f;
-  constexpr float rotation_speed = 90.0f;
-
-  const float movement = movement_speed * delta_time;
-  const float rotation = rotation_speed * delta_time;
-
-  if (ui_context_.window.is_key_pressed(sf::Keyboard::Key::W)) {
-    model_context_.camera.move_forward(movement);
-  }
-  if (ui_context_.window.is_key_pressed(sf::Keyboard::Key::S)) {
-    model_context_.camera.move_forward(-movement);
-  }
-  if (ui_context_.window.is_key_pressed(sf::Keyboard::Key::D)) {
-    model_context_.camera.move_right(movement);
-  }
-  if (ui_context_.window.is_key_pressed(sf::Keyboard::Key::A)) {
-    model_context_.camera.move_right(-movement);
-  }
-
-  if (ui_context_.window.is_key_pressed(sf::Keyboard::Key::Left)) {
-    model_context_.camera.rotate_yaw(-rotation);
-  }
-  if (ui_context_.window.is_key_pressed(sf::Keyboard::Key::Right)) {
-    model_context_.camera.rotate_yaw(rotation);
-  }
-  if (ui_context_.window.is_key_pressed(sf::Keyboard::Key::Up)) {
-    model_context_.camera.rotate_pitch(rotation);
-  }
-  if (ui_context_.window.is_key_pressed(sf::Keyboard::Key::Down)) {
-    model_context_.camera.rotate_pitch(-rotation);
-  }
-}
-
 void App::render_frame(const TriangulatedObject* highlighted_object) {
   model_context_.renderer.draw_scene(ui_context_.window.size(),
                                      highlighted_object);
   ui_context_.window.display();
 }
 
-void App::print_frame_time(float delta_time, float& accumulator) const {
-  accumulator += delta_time;
-  if (accumulator < 1.0f) {
-    return;
-  }
-
-  std::cout << "Frame time: " << delta_time * 1000.0f << " ms\n";
-  accumulator = 0.0f;
-}
-
 int App::run() {
   try {
     sf::Clock clock;
-    float frame_time_accumulator = 0.0f;
 
-    while (ui_context_.window.is_running()) {
-      const float delta_time = clock.restart().asSeconds();
-      KeyboardAction keyboard_action = KeyboardAction::None;
-
-      while (auto event = ui_context_.window.poll_event()) {
-        ui_context_.window.handle_event(*event);
-        const KeyboardAction next_action = action_from_event(*event);
-        if (next_action != KeyboardAction::None) {
-          keyboard_action = next_action;
+    while (window_.is_running()) {
+      delta_time_ = clock.restart().asSeconds();
+      Action action = Action::None;
+      while (auto event = window_.poll_event()) {
+        if (event->is<sf::Event::Closed>()) {
+          window_.render_window().close();
+          return 0;
+        }
+        if (event->is<sf::Event::FocusLost>()) {
+          pressed_keys_.clear();
+          action = Action::None;
+        }
+        if (const auto* resized = event->getIf<sf::Event::Resized>()) {
+          glViewport(0, 0, resized->size.x, resized->size.y);
+        }
+        if (const auto* released = event->getIf<sf::Event::KeyReleased>()) {
+          pressed_keys_.erase(released->code);
+        }
+        if (const auto* text = event->getIf<sf::Event::TextEntered>()) {
+          if (text->unicode == U'+') {
+            action = Action::ImportObject;
+          }
+        }
+        if (const auto* key = event->getIf<sf::Event::KeyPressed>()) {
+          pressed_keys_.insert(key->code);
+          switch (key->code) {
+            case sf::Keyboard::Key::Add:
+              action = Action::ImportObject;
+              break;
+            case sf::Keyboard::Key::E:
+              action = Action::Edit;
+              break;
+            case sf::Keyboard::Key::B:
+              action = Action::Back;
+              break;
+            case sf::Keyboard::Key::Right:
+              if (state_ == AppState::Edit) {
+                action = Action::NextObject;
+              }
+              break;
+            case sf::Keyboard::Key::Left:
+              if (state_ == AppState::Edit) {
+                action = Action::PreviousObject;
+              }
+              break;
+            case sf::Keyboard::Key::C:
+              action = Action::ChangeColor;
+              break;
+            case sf::Keyboard::Key::P:
+              action = Action::MoveObject;
+              break;
+            case sf::Keyboard::Key::S:
+              action = Action::ScaleObject;
+              break;
+            case sf::Keyboard::Key::R:
+              action = Action::RotateObject;
+              break;
+            case sf::Keyboard::Key::Delete:
+              action = Action::DeleteObject;
+              break;
+            default:
+              break;
+          }
         }
       }
 
       if (!ui_context_.window.is_running()) {
         continue;
       }
-
       switch (state_) {
         case AppState::Rendering: {
-          if (keyboard_action == KeyboardAction::Edit) {
+          if (action == Action::Edit) {
             switch_state(AppState::Edit);
             break;
           }
 
-          update_camera(delta_time);
+          if (!window_.render_window().hasFocus()) {
+            pressed_keys_.clear();
+            sf::sleep(sf::milliseconds(50));
+            // После возвращения фокуса delta_time_ не должен учитывать паузу.
+            clock.restart();
+            continue;
+          }
+
+          if (pressed_keys_.count(sf::Keyboard::Key::W)) {
+            handle_keyboard_command<Action::MoveForward>();
+          }
+          if (pressed_keys_.count(sf::Keyboard::Key::S)) {
+            handle_keyboard_command<Action::MoveBackward>();
+          }
+          if (pressed_keys_.count(sf::Keyboard::Key::D)) {
+            handle_keyboard_command<Action::MoveRight>();
+          }
+          if (pressed_keys_.count(sf::Keyboard::Key::A)) {
+            handle_keyboard_command<Action::MoveLeft>();
+          }
+          if (pressed_keys_.count(sf::Keyboard::Key::Left)) {
+            handle_keyboard_command<Action::RotateLeft>();
+          }
+          if (pressed_keys_.count(sf::Keyboard::Key::Right)) {
+            handle_keyboard_command<Action::RotateRight>();
+          }
+          if (pressed_keys_.count(sf::Keyboard::Key::Up)) {
+            handle_keyboard_command<Action::RotateUp>();
+          }
+          if (pressed_keys_.count(sf::Keyboard::Key::Down)) {
+            handle_keyboard_command<Action::RotateDown>();
+          }
           render_frame();
-          print_frame_time(delta_time, frame_time_accumulator);
           break;
         }
 
         case AppState::Edit: {
-          if (keyboard_action == KeyboardAction::Back) {
+          if (action == Action::Back) {
             switch_state(AppState::Rendering);
             break;
           }
-          if (keyboard_action == KeyboardAction::NextObject &&
-              !model_context_.world.empty()) {
-            model_context_.world.select_next_object();
+          if (action == Action::NextObject) {
+            handle_keyboard_command<Action::NextObject>();
             break;
           }
-          if (keyboard_action == KeyboardAction::PreviousObject &&
-              !model_context_.world.empty()) {
-            model_context_.world.select_previous_object();
+          if (action == Action::PreviousObject) {
+            handle_keyboard_command<Action::PreviousObject>();
             break;
           }
-          if (keyboard_action == KeyboardAction::Import) {
-            handle_console_command<ConsoleAction::ImportObject>();
+          if (action == Action::ImportObject) {
+            handle_console_command<Action::ImportObject>();
             break;
           }
-          if (keyboard_action == KeyboardAction::Color) {
-            handle_console_command<ConsoleAction::ChangeColor>();
+          if (action == Action::ChangeColor) {
+            handle_console_command<Action::ChangeColor>();
             break;
           }
-          if (keyboard_action == KeyboardAction::Position) {
-            handle_console_command<ConsoleAction::MoveObject>();
+          if (action == Action::MoveObject) {
+            handle_console_command<Action::MoveObject>();
             break;
           }
-          if (keyboard_action == KeyboardAction::Scale) {
-            handle_console_command<ConsoleAction::ScaleObject>();
+          if (action == Action::ScaleObject) {
+            handle_console_command<Action::ScaleObject>();
             break;
           }
-          if (keyboard_action == KeyboardAction::Rotation) {
-            handle_console_command<ConsoleAction::RotateObject>();
+          if (action == Action::RotateObject) {
+            handle_console_command<Action::RotateObject>();
             break;
           }
-          if (keyboard_action == KeyboardAction::Delete) {
-            handle_console_command<ConsoleAction::DeleteObject>();
+          if (action == Action::DeleteObject) {
+            handle_console_command<Action::DeleteObject>();
             break;
           }
 
-          render_frame(model_context_.world.selected_object());
-          print_frame_time(delta_time, frame_time_accumulator);
+          if (!window_.render_window().hasFocus()) {
+            pressed_keys_.clear();
+            sf::sleep(sf::milliseconds(50));
+            // После возвращения фокуса delta_time_ не должен учитывать паузу.
+            clock.restart();
+            continue;
+          }
+
+          render_frame(world_.selected_object());
           break;
         }
       }
@@ -176,80 +223,69 @@ int App::run() {
   return 0;
 }
 
-KeyboardAction App::action_from_event(const sf::Event& event) const {
-  if (const auto* text = event.getIf<sf::Event::TextEntered>()) {
-    if (text->unicode == U'+') {
-      return KeyboardAction::Import;
-    }
-  }
-
-  const auto* key_pressed = event.getIf<sf::Event::KeyPressed>();
-  if (key_pressed == nullptr) {
-    return KeyboardAction::None;
-  }
-
-  if (key_pressed->code == sf::Keyboard::Key::Add) {
-    return KeyboardAction::Import;
-  }
-  if (key_pressed->code == sf::Keyboard::Key::E) {
-    return KeyboardAction::Edit;
-  }
-  if (key_pressed->code == sf::Keyboard::Key::B) {
-    return KeyboardAction::Back;
-  }
-  if (key_pressed->code == sf::Keyboard::Key::Right) {
-    return KeyboardAction::NextObject;
-  }
-  if (key_pressed->code == sf::Keyboard::Key::Left) {
-    return KeyboardAction::PreviousObject;
-  }
-  if (key_pressed->code == sf::Keyboard::Key::C) {
-    return KeyboardAction::Color;
-  }
-  if (key_pressed->code == sf::Keyboard::Key::P) {
-    return KeyboardAction::Position;
-  }
-  if (key_pressed->code == sf::Keyboard::Key::S) {
-    return KeyboardAction::Scale;
-  }
-  if (key_pressed->code == sf::Keyboard::Key::R) {
-    return KeyboardAction::Rotation;
-  }
-  if (key_pressed->code == sf::Keyboard::Key::Delete) {
-    return KeyboardAction::Delete;
-  }
-
-  return KeyboardAction::None;
-}
-
-template <ConsoleAction Action>
+template <Action action>
 void App::handle_console_command() {
-  if constexpr (Action != ConsoleAction::ImportObject) {
-    if (model_context_.world.empty()) {
-      ui_context_.dialogue.print_message("No selected object.");
+  if constexpr (action != Action::ImportObject) {
+    if (world_.empty()) {
+      dialogue_.print_message("No selected object.");
       return;
     }
   }
 
-  using Messages = typename ConsoleActionTraits<Action>::Messages;
-  using Validator = typename ConsoleActionTraits<Action>::Validator;
-  using ConsoleCommand = typename ConsoleActionTraits<Action>::ConsoleCommand;
+  using Messages = MessageTraits<action>;
+  using ActionValidator = Validator<action>;
+  using ActionCommand = typename ActionTraits<action>::Command;
 
-  auto request =
-      ui_context_.dialogue.get_user_request(Messages{}, Validator{});
-  if (!request.has_value()) {
-    return;
+  while (true) {
+    auto request = dialogue_.get_user_request(Messages{}, ActionValidator{});
+    // Discard keys accumulated during the blocking console dialogue.
+    while (auto event = window_.poll_event()) {
+      if (event->is<sf::Event::Closed>()) {
+        window_.render_window().close();
+        pressed_keys_.clear();
+        return;
+      }
+      if (const auto* resized = event->getIf<sf::Event::Resized>()) {
+        glViewport(0, 0, resized->size.x, resized->size.y);
+      }
+    }
+    pressed_keys_.clear();
+    if (!request.has_value()) {
+      return;
+    }
+
+    ActionCommand command;
+    try {
+      dialogue_.print_message("Applying changes...");
+      if constexpr (action == Action::ImportObject) {
+        auto mesh = importer_.load_mesh_from_file(request->path);
+        TriangulatedObject object(std::move(mesh));
+        command.execute(world_, std::move(object));
+      } else {
+        command.execute(world_, *request);
+      }
+      dialogue_.print_message("Success!");
+      return;
+    } catch (const std::runtime_error& e) {
+      dialogue_.print_message(std::string("Failed to execute command: ") +
+                              e.what());
+      dialogue_.print_message("Try again or type \"exit\" to cancel.");
+    }
+  }
+}
+
+template <Action action>
+void App::handle_keyboard_command() {
+  using Request = typename ActionTraits<action>::Request;
+  using ActionCommand = typename ActionTraits<action>::Command;
+
+  Request request{};
+  if constexpr (!std::is_same_v<Request, SelectObjectRequest>) {
+    request.delta_time = delta_time_;
   }
 
-  ConsoleCommand command;
-  try {
-    ui_context_.dialogue.print_message("Applying changes...");
-    command.execute(model_context_, *request);
-    ui_context_.dialogue.print_message("Success!");
-  } catch (const std::runtime_error& e) {
-    throw std::runtime_error(std::string("Failed to execute command: ") +
-                             e.what());
-  }
+  ActionCommand command;
+  command.execute(world_, request);
 }
 
 }  // namespace Renderer

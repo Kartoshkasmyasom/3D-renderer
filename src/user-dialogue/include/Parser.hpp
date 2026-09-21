@@ -1,11 +1,11 @@
 #pragma once
 
-#include "Token.hpp"
-
 #include <algorithm>
 #include <sstream>
 #include <string>
 #include <vector>
+
+#include "Token.hpp"
 
 namespace Renderer {
 

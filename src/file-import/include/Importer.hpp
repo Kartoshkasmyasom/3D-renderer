@@ -1,8 +1,8 @@
 #pragma once
 
-#include "MeshData.hpp"
-
 #include <string>
+
+#include "object/MeshData.hpp"
 
 struct aiMesh;
 struct aiScene;

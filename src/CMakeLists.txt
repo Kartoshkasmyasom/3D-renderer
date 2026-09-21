@@ -13,7 +13,8 @@ find_package(assimp REQUIRED)
 
 
 add_subdirectory(project-exceptions)
-add_subdirectory(entities)
+add_subdirectory(world)
+add_subdirectory(renderer)
 add_subdirectory(file-import)
 add_subdirectory(user-dialogue)
 add_subdirectory(app)
@@ -21,3 +22,8 @@ add_subdirectory(app)
 add_executable(${PROJECT_NAME} main.cpp)
 
 target_link_libraries(${PROJECT_NAME} PRIVATE app)
+
+include(CTest)
+if(BUILD_TESTING)
+  add_subdirectory("${CMAKE_SOURCE_DIR}/../tests" "${CMAKE_BINARY_DIR}/tests")
+endif()

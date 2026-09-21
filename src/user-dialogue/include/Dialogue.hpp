@@ -1,13 +1,13 @@
 #pragma once
 
-#include "Parser.hpp"
-#include "Token.hpp"
-
 #include <iostream>
 #include <optional>
 #include <string>
 #include <string_view>
 #include <vector>
+
+#include "Parser.hpp"
+#include "Token.hpp"
 
 namespace Renderer {
 
@@ -17,7 +17,7 @@ class Dialogue {
   void print_message(std::string_view message) const;
 
   template <typename Messages, typename Validator>
-  auto get_user_request(const Messages&, const Validator&)
+  auto get_user_request(const Messages&, const Validator&) const
       -> std::optional<typename Validator::Request> {
     std::cout << Messages::hint << std::endl;
 
@@ -27,8 +27,8 @@ class Dialogue {
       std::string input;
       if (!std::getline(std::cin, input)) {
         std::cin.clear();
-        std::cout << "Input error. Try again.\n";
-        continue;
+        std::cout << "Input is unavailable. Input cancelled.\n";
+        return std::nullopt;
       }
 
       if (input == "exit") {

@@ -1,10 +1,30 @@
 {
   "name": "3d-renderer",
   "version-string": "0.1.0",
+  "builtin-baseline": "99a97de2cb371449d4fb9dc970f2ac562d689ec2",
   "dependencies": [
     "assimp",
     "eigen3",
     "glew",
     "sfml"
+  ],
+  "overrides": [
+    {
+      "name": "assimp",
+      "version": "6.0.4",
+      "port-version": 1
+    },
+    {
+      "name": "eigen3",
+      "version": "5.0.1"
+    },
+    {
+      "name": "glew",
+      "version": "2.3.1"
+    },
+    {
+      "name": "sfml",
+      "version": "3.0.2"
+    }
   ]
 }
