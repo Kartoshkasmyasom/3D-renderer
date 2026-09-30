@@ -6,7 +6,6 @@
 
 #include "ActionTraits.hpp"
 #include "Dialogue.hpp"
-#include "EditSubsystem.hpp"
 #include "Importer.hpp"
 #include "Renderer.hpp"
 #include "Window.hpp"
@@ -21,11 +20,11 @@ enum class AppState {
 
 class App {
  public:
-  static const std::string help_rendering =
+  inline static const std::string help_rendering =
       "Rendering mode is active.\n"
       "Press E to enter edit mode.";
 
-  static const std::string help_edit =
+  inline static const std::string help_edit =
       "Edit mode is active.\n"
       "Use Left/Right to select objects. Press + to import, C to change color, "
       "P to change position, S to change scale, R to change rotation, Delete "
